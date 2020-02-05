@@ -26,28 +26,31 @@ def tweetCall(searchParam, tweetNum):
 
   tweetList = api.search(searchParam, count=tweetNum)
 
-  tweetInd = []
+  tweetUrlInd = []
+  tweetTextInd = []
 
+  tweetDic = {}
 
   for tweet in tweetList:
-    try:
-      if tweet.entities['media'][0]['type'] == 'photo':
-        tweetInd.append(tweet.entities['media'][0]['media_url'])
+    if (not tweet.retweeted) and ('RT @' not in tweet.text):
+      try:
+        if tweet.entities['media'][0]['type'] == 'photo':
+          tweetUrlInd.append(tweet.entities['media'][0]['media_url'])
+          tweetTextInd.append(tweet._json['text'])
 
-        with open("feedList.txt", 'a+') as f:
-          f.write(tweet._json['text'] + '\n\n')
-    except BaseException:
-      pass
+          tweetDic[tweet._json['text']] = tweet.entities['media'][0]['media_url']
 
-  for i in range(len(tweetInd)):
-    link = str(tweetInd[i])
+          with open("feedList.txt", 'a+') as f:
+            f.write(tweet._json['text'] + '\n\n')
+      except BaseException:
+        pass
+
+  for i in range(len(tweetUrlInd)):
+    link = str(tweetUrlInd[i])
     imgIndex = "%04d" % i
     urllib.request.urlretrieve(link, f"jpg{imgIndex}.jpg")
-'''    if 'text' in tweet._json:
-      tweetInd.append(tweet._json['text'])
 
-      with open("feedList.txt", 'a+') as f:
-        f.write(tweet._json['text'] + '\n\n')'''
+  return tweetDic
 
 def imgSentiment():
 
@@ -74,9 +77,19 @@ def imgSentiment():
   return labelsList
 
 def tweetSummary(searchParam, tweetNum):
-  tweetCall(searchParam, tweetNum)
-  imgSentiment()
+  textDict = tweetCall(searchParam, tweetNum)
+  keys = list(textDict)
+  imgLabel = imgSentiment()
+
+  tweetSentInd = {}
+
+  for i in range(len(keys)):
+    tweetSentInd[keys[i]] = imgLabel[i]
+
+  return tweetSentInd
 
 if __name__ == '__main__':
-  tweetCall('puppy', 50)
-  print(imgSentiment())
+  puppy = tweetSummary('puppy', 100)
+
+  print(puppy)
+  print(len(puppy))
