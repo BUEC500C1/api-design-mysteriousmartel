@@ -88,8 +88,8 @@ def tweetSummary(searchParam, tweetNum):
 
   return tweetSentInd
 
-if __name__ == '__main__':
+'''if __name__ == '__main__':
   puppy = tweetSummary('puppy', 100)
 
   print(puppy)
-  print(len(puppy))
+  print(len(puppy))'''
