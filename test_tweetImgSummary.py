@@ -5,3 +5,6 @@ def test_tweetArrangement():
     puppyKeys = list(puppy)
     labels = len(tweetImgSummary.imgSentiment())
     assert len(puppy) == labels
+
+if __name__ == '__main__':
+  test_tweetArrangement()
